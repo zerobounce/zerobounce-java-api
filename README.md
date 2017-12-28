@@ -20,6 +20,7 @@ pom.xml file if you're building via Maven (already added if you're cloning this 
     <artifactId>httpclient</artifactId>
     <version>4.5.4</version>
 </dependency>
+
 <dependency>
     <groupId>org.json</groupId>
     <artifactId>json</artifactId>
@@ -31,7 +32,7 @@ pom.xml file if you're building via Maven (already added if you're cloning this 
 
 ```java
 ZeroBounceApi zeroBounceApi = new ZeroBounceApi("YOUR_API_KEY");
-int credits = zeroBounceApi.getCredits()
-JSONObject validation = zeroBounceApi.validate("some@email.com")
-JSONOBject validationWithIp = zeroBounceApi.validateWithIpAddress("some@email.com", "some.ip.address")
+int credits = zeroBounceApi.getCredits();
+JSONObject validation = zeroBounceApi.validate("some@email.com");
+JSONObject validationWithIp = zeroBounceApi.validateWithIpAddress("some@email.com", "some.ip.address");
 ```
