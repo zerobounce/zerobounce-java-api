@@ -1,7 +1,7 @@
 Zerobounce Java API wrapper
 =====================
 
-[ZeroBounce](https://www.zerobounce.net>) Java API
+[ZeroBounce](https://www.zerobounce.net) Java API
 
 
 This is a Java wrapper class example for the ZeroBounce API.
