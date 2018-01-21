@@ -2,6 +2,7 @@ package com.zerobounce.api;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.HttpClients;
@@ -9,6 +10,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.DateFormat;
@@ -20,7 +22,7 @@ import java.util.Locale;
 public class ZeroBounceApi {
     private final String apiKey;
     private final String baseUrl = "https://api.zerobounce.net/v1";
-    private final HttpClient httpClient = HttpClients.custom().build();
+    private final HttpClient httpClient;
     private final DateFormat dateTimeMillisFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss.SSS", Locale.ENGLISH);
     private final DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH);
 
@@ -28,8 +30,11 @@ public class ZeroBounceApi {
      * Get an instance of the API helper class
      * @param apiKey - your private API key
      */
-    public ZeroBounceApi(String apiKey) {
+    public ZeroBounceApi(String apiKey, int timeoutSeconds) {
         this.apiKey = apiKey;
+
+        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(10).build();
+        this.httpClient = HttpClients.custom().setDefaultRequestConfig(requestConfig).build();
     }
 
     /**
@@ -65,40 +70,45 @@ public class ZeroBounceApi {
                 .build();
 
         HttpGet httpGet = new HttpGet(uri);
-        HttpResponse httpResponse = httpClient.execute(httpGet);
+        try {
+            HttpResponse httpResponse = httpClient.execute(httpGet);
+            if (httpResponse.getStatusLine().getStatusCode() == 200) {
+                JSONObject jsonObject = new JSONObject(EntityUtils.toString(httpResponse.getEntity()));
 
-        if (httpResponse.getStatusLine().getStatusCode() != 200) {
-            throw new IllegalStateException(httpResponse.getStatusLine().getStatusCode() + " - " + EntityUtils.toString(httpResponse.getEntity()));
-        } else {
-            JSONObject jsonObject = new JSONObject(EntityUtils.toString(httpResponse.getEntity()));
+                String emailAddress = jsonObject.isNull("address") ? null : jsonObject.getString("address");
+                String status = jsonObject.isNull("status") ? null : jsonObject.getString("status");
+                String subStatus = jsonObject.isNull("sub_status") ? null : jsonObject.getString("sub_status");
+                String account = jsonObject.isNull("account") ? null : jsonObject.getString("account");
+                String domain = jsonObject.isNull("domain") ? null : jsonObject.getString("domain");
+                Boolean disposable = jsonObject.isNull("disposable") ? null : jsonObject.getBoolean("disposable");
+                Boolean toxic = jsonObject.isNull("toxic") ? null : jsonObject.getBoolean("toxic");
+                String firstName = jsonObject.isNull("firstname") ? null : jsonObject.getString("firstname");
+                String lastName = jsonObject.isNull("lastname") ? null : jsonObject.getString("lastname");
+                String gender = jsonObject.isNull("gender") ? null : jsonObject.getString("gender");
+                String location = jsonObject.isNull("location") ? null : jsonObject.getString("location");
 
-            String emailAddress = jsonObject.isNull("address") ? null : jsonObject.getString("address");
-            String status = jsonObject.isNull("status") ? null : jsonObject.getString("status");
-            String subStatus = jsonObject.isNull("sub_status") ? null : jsonObject.getString("sub_status");
-            String account = jsonObject.isNull("account") ? null : jsonObject.getString("account");
-            String domain = jsonObject.isNull("domain") ? null : jsonObject.getString("domain");
-            Boolean disposable = jsonObject.isNull("disposable") ? null : jsonObject.getBoolean("disposable");
-            Boolean toxic = jsonObject.isNull("toxic") ? null : jsonObject.getBoolean("toxic");
-            String firstName = jsonObject.isNull("firstname") ? null : jsonObject.getString("firstname");
-            String lastName = jsonObject.isNull("lastname") ? null : jsonObject.getString("lastname");
-            String gender = jsonObject.isNull("gender") ? null : jsonObject.getString("gender");
-            String location = jsonObject.isNull("location") ? null : jsonObject.getString("location");
+                Date creationDate = null;
+                try {
+                    creationDate = jsonObject.isNull("creationdate") ? null : dateFormat.parse(jsonObject.getString("creationdate"));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
 
-            Date creationDate = null;
-            try {
-                creationDate = jsonObject.isNull("creationdate") ? null : dateFormat.parse(jsonObject.getString("creationdate"));
-            } catch (ParseException e) {
-                e.printStackTrace();
+                Date processedAt = null;
+                try {
+                    processedAt = jsonObject.isNull("processedat") ? null : dateTimeMillisFormat.parse(jsonObject.getString("processedat"));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+                return new ZeroBounceResponse(emailAddress, status, subStatus, account, domain, disposable, toxic, firstName, lastName, gender, location, creationDate, processedAt);
+            } else {
+                throw new IllegalStateException(httpResponse.getStatusLine().getStatusCode() + " - " + EntityUtils.toString(httpResponse.getEntity()));
             }
-
-            Date processedAt = null;
-            try {
-                processedAt = jsonObject.isNull("processedat") ? null : dateTimeMillisFormat.parse(jsonObject.getString("processedat"));
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-            return new ZeroBounceResponse(emailAddress, status, subStatus, account, domain, disposable, toxic, firstName, lastName, gender, location, creationDate, processedAt);
+        } catch (SocketTimeoutException ex) {
+            return new ZeroBounceResponse(email.toLowerCase(), "Unknown", "timeout_exceeded", null, null, null, null, null, null, null, null, null, null);
+        } catch (Exception ex) {
+            return new ZeroBounceResponse(email.toLowerCase(), "Unknown", "exception_occurred", null, null, null, null, null, null, null, null, null, null);
         }
     }
 
@@ -117,11 +127,9 @@ public class ZeroBounceApi {
                 .build();
 
         HttpGet httpGet = new HttpGet(uri);
-        HttpResponse httpResponse = httpClient.execute(httpGet);
-
-        if (httpResponse.getStatusLine().getStatusCode() != 200) {
-            throw new IllegalStateException(httpResponse.getStatusLine().getStatusCode() + " - " + EntityUtils.toString(httpResponse.getEntity()));
-        } else {
+        try {
+            HttpResponse httpResponse = httpClient.execute(httpGet);
+            if (httpResponse.getStatusLine().getStatusCode() == 200) {
             JSONObject jsonObject = new JSONObject(EntityUtils.toString(httpResponse.getEntity()));
 
             String emailAddress = jsonObject.isNull("address") ? null : jsonObject.getString("address");
@@ -155,6 +163,13 @@ public class ZeroBounceApi {
             }
 
             return new ZeroBounceResponseWithIp(emailAddress, status, subStatus, account, domain, disposable, toxic, firstName, lastName, gender, location, creationDate, processedAt, country, city, zipcode, region);
+            } else {
+                throw new IllegalStateException(httpResponse.getStatusLine().getStatusCode() + " - " + EntityUtils.toString(httpResponse.getEntity()));
+            }
+        } catch (SocketTimeoutException ex) {
+            return new ZeroBounceResponseWithIp(email.toLowerCase(), "Unknown", "timeout_exceeded", null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        } catch (Exception ex) {
+            return new ZeroBounceResponseWithIp(email.toLowerCase(), "Unknown", "exception_occurred", null, null, null, null, null, null, null, null, null, null, null, null, null, null);
         }
     }
 
@@ -167,8 +182,8 @@ public class ZeroBounceApi {
         private final String subStatus;
         private final String account;
         private final String domain;
-        private final boolean disposable;
-        private final boolean toxic;
+        private final Boolean disposable;
+        private final Boolean toxic;
         private final String firstName;
         private final String lastName;
         private final String gender;
@@ -176,7 +191,7 @@ public class ZeroBounceApi {
         private final Date creationDate;
         private final Date processedAt;
 
-        public ZeroBounceResponse(String emailAddress, String status, String subStatus, String account, String domain, boolean disposable, boolean toxic, String firstName, String lastName, String gender, String location, Date creationDate, Date processedAt) {
+        public ZeroBounceResponse(String emailAddress, String status, String subStatus, String account, String domain, Boolean disposable, Boolean toxic, String firstName, String lastName, String gender, String location, Date creationDate, Date processedAt) {
             this.emailAddress = emailAddress;
             this.status = status;
             this.subStatus = subStatus;
@@ -212,11 +227,11 @@ public class ZeroBounceApi {
             return domain;
         }
 
-        public boolean isDisposable() {
+        public Boolean isDisposable() {
             return disposable;
         }
 
-        public boolean isToxic() {
+        public Boolean isToxic() {
             return toxic;
         }
 
@@ -273,8 +288,8 @@ public class ZeroBounceApi {
         private final String subStatus;
         private final String account;
         private final String domain;
-        private final boolean disposable;
-        private final boolean toxic;
+        private final Boolean disposable;
+        private final Boolean toxic;
         private final String firstName;
         private final String lastName;
         private final String gender;
@@ -286,7 +301,7 @@ public class ZeroBounceApi {
         private final String zipcode;
         private final String region;
 
-        public ZeroBounceResponseWithIp(String emailAddress, String status, String subStatus, String account, String domain, boolean disposable, boolean toxic, String firstName, String lastName, String gender, String location, Date creationDate, Date processedAt, String country, String city, String zipcode, String region) {
+        public ZeroBounceResponseWithIp(String emailAddress, String status, String subStatus, String account, String domain, Boolean disposable, Boolean toxic, String firstName, String lastName, String gender, String location, Date creationDate, Date processedAt, String country, String city, String zipcode, String region) {
             this.emailAddress = emailAddress;
             this.status = status;
             this.subStatus = subStatus;
@@ -326,11 +341,11 @@ public class ZeroBounceApi {
             return domain;
         }
 
-        public boolean isDisposable() {
+        public Boolean isDisposable() {
             return disposable;
         }
 
-        public boolean isToxic() {
+        public Boolean isToxic() {
             return toxic;
         }
 
