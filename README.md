@@ -30,14 +30,14 @@ pom.xml file if you're building via Maven (already added if you're cloning this 
 
 **Class, Properties, and Methods:**
 
-<b><i>ZeroBounceApi</b></i> Class
+<b><i>ZeroBounceApi</b></i> Class:
 
 |<b>Parameters</b>|<b>Descriptions</b> 
 |:--- |:--- 
 apiKey  | Located in your account.. 
 timeoutSeconds | Timeout settings in seconds, setting this enables you to control how long you are willing to wait for a response from the API. When the timeout occurs an "Unknown" result is returned.
 
-<b><i>Validate(email)</b></i> method
+<b><i>Validate(email)</b></i> method:
   
 |<b>Property</b>|<b>Possible Values</b> 
 |:--- |:--- 
@@ -55,7 +55,7 @@ getCreationDate() |The creation date of the email when available or [null].
 getLocation() |The location of the owner of the email when available or [null].
 getProcessedAt() |The UTC time the email was validated.
 
-<b><i>validateWithIpAddress(email, ip)(email)</b></i> method
+<b><i>validateWithIpAddress(email, ip)(email)</b></i> method:
 These additional properties are available with the ValidateWithIpAddress method.
 
 |<b>Property</b>|<b>Possible Values</b> 
@@ -65,7 +65,7 @@ getCity() | The city the IP address is from.
 getZipcode() | The zip code the IP address is from.
 getRegion() | The region/state the IP address is from.
 
-<b><i>GetCredit</b></i> method
+<b><i>GetCredit</b></i> method:
 
 |<b>Property</b>|<b>Possible Values</b> 
 |:--- |:--- 
