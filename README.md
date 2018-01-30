@@ -28,8 +28,16 @@ pom.xml file if you're building via Maven (already added if you're cloning this 
 </dependency>
 ```
 
-**Properties and possible values returned by:**
-1. <b><i>Validate()</b></i> method
+**Class, Properties, and Methods: **
+
+1. <b><i>ZeroBounceApi</b></i> Class
+
+|<b>Parameters</b>|<b>Descriptions</b> 
+|:--- |:--- 
+apiKey  | Located in your account.. 
+timeoutSeconds | Timeout settings in seconds, setting this enables you to control how long you are willing to wait for a response from the API. When the timeout occurs an "Unknown" result is returned.
+
+2. <b><i>Validate(email)</b></i> method
   
 |<b>Property</b>|<b>Possible Values</b> 
 |:--- |:--- 
@@ -47,8 +55,18 @@ getCreationDate() |The creation date of the email when available or [null].
 getLocation() |The location of the owner of the email when available or [null].
 getProcessedAt() |The UTC time the email was validated.
 
-2. <b><i>GetCredit</b></i> method
-  
+3. <b><i>validateWithIpAddress(email, ip)(email)</b></i> method
+These additional properties are available with the ValidateWithIpAddress method.
+
+|<b>Property</b>|<b>Possible Values</b> 
+|:--- |:--- 
+getCountry()  | The country the IP address is from. 
+getCity() | The city the IP address is from.
+getZipcode() | The zip code the IP address is from.
+getRegion() | The region/state the IP address is from.
+
+4. <b><i>GetCredit</b></i> method
+
 |<b>Property</b>|<b>Possible Values</b> 
 |:--- |:--- 
 getCredits()  | The number of credits left in account for email validation.
@@ -92,7 +110,14 @@ getCredits()  | The number of credits left in account for email validation.
 The validation methods return objects on which you call get methods which return the relevant information. Please see the code for all getters and below for a sample:
 
 ```java
-ZeroBounceApi zeroBounceApi = new ZeroBounceApi("YOUR_API_KEY");
+//Depending on how you use the API, you might want it to time out faster,
+//for example on a registration screen. 
+//Normally the API will return results very fast, but a small percentage of
+//mail servers take upwards of 20+ seconds to respond. 
+//If the API times out, it will return a status of "Unknown" and 
+//a sub_status of "timeout_exceeded" 
+
+ZeroBounceApi zeroBounceApi = new ZeroBounceApi("YOUR_API_KEY",TIMEOUT_IN_SECONDS);
 
 // Get credits and assign to int variable
 int credits = zeroBounceApi.getCredits();
