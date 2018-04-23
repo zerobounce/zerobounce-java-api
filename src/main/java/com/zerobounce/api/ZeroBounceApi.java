@@ -176,7 +176,7 @@ public class ZeroBounceApi {
     /**
      * Response wrapper for /validate endpoint
      */
-    protected class ZeroBounceResponse {
+    public class ZeroBounceResponse {
         private final String emailAddress;
         private final String status;
         private final String subStatus;
@@ -191,7 +191,7 @@ public class ZeroBounceApi {
         private final Date creationDate;
         private final Date processedAt;
 
-        public ZeroBounceResponse(String emailAddress, String status, String subStatus, String account, String domain, Boolean disposable, Boolean toxic, String firstName, String lastName, String gender, String location, Date creationDate, Date processedAt) {
+        protected ZeroBounceResponse(String emailAddress, String status, String subStatus, String account, String domain, Boolean disposable, Boolean toxic, String firstName, String lastName, String gender, String location, Date creationDate, Date processedAt) {
             this.emailAddress = emailAddress;
             this.status = status;
             this.subStatus = subStatus;
@@ -282,7 +282,7 @@ public class ZeroBounceApi {
     /**
      * Response wrapper for /validatewithip endpoint
      */
-    protected class ZeroBounceResponseWithIp {
+    public class ZeroBounceResponseWithIp {
         private final String emailAddress;
         private final String status;
         private final String subStatus;
@@ -301,7 +301,7 @@ public class ZeroBounceApi {
         private final String zipcode;
         private final String region;
 
-        public ZeroBounceResponseWithIp(String emailAddress, String status, String subStatus, String account, String domain, Boolean disposable, Boolean toxic, String firstName, String lastName, String gender, String location, Date creationDate, Date processedAt, String country, String city, String zipcode, String region) {
+        protected ZeroBounceResponseWithIp(String emailAddress, String status, String subStatus, String account, String domain, Boolean disposable, Boolean toxic, String firstName, String lastName, String gender, String location, Date creationDate, Date processedAt, String country, String city, String zipcode, String region) {
             this.emailAddress = emailAddress;
             this.status = status;
             this.subStatus = subStatus;
