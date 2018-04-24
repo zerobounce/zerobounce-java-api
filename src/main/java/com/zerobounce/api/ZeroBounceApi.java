@@ -33,7 +33,7 @@ public class ZeroBounceApi {
     public ZeroBounceApi(String apiKey, int timeoutSeconds) {
         this.apiKey = apiKey;
 
-        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(10).build();
+        RequestConfig requestConfig = RequestConfig.custom().setConnectTimeout(timeoutSeconds * 1000).build();
         this.httpClient = HttpClients.custom().setDefaultRequestConfig(requestConfig).build();
     }
 
