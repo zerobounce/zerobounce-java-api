@@ -1,10 +1,11 @@
-Zerobounce Java API wrapper
+Zerobounce Java API wrapper v1
 =====================
 
-[ZeroBounce](https://www.zerobounce.net) Java API
+[ZeroBounce](https://www.zerobounce.net) Java API v1
 
+This is a Java wrapper class example for the ZeroBounce API v1.
 
-This is a Java wrapper class example for the ZeroBounce API.
+Please use version 2: https://github.com/zerobounce/zerobounce-java-api-v2
 
 The project has 2 dependencies:
 1) Apache HttpClient
