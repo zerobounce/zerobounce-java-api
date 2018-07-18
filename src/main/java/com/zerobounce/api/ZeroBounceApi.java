@@ -53,13 +53,7 @@ public class ZeroBounceApi {
         if (httpResponse.getStatusLine().getStatusCode() != 200) {
             throw new IllegalStateException(httpResponse.getStatusLine().getStatusCode() + " - " + EntityUtils.toString(httpResponse.getEntity()));
         } else {
-            JSONObject jsonObject = new JSONObject(EntityUtils.toString(httpResponse.getEntity()));
-
-            if (jsonObject.has("error")) {
-                throw new ZeroBounceApiException(jsonObject.getString("error"));
-            }
-
-            return jsonObject.getInt("Credits");
+            return new JSONObject(EntityUtils.toString(httpResponse.getEntity())).getInt("Credits");
         }
     }
 
@@ -80,10 +74,6 @@ public class ZeroBounceApi {
             HttpResponse httpResponse = httpClient.execute(httpGet);
             if (httpResponse.getStatusLine().getStatusCode() == 200) {
                 JSONObject jsonObject = new JSONObject(EntityUtils.toString(httpResponse.getEntity()));
-
-                if (jsonObject.has("error")) {
-                    throw new ZeroBounceApiException(jsonObject.getString("error"));
-                }
 
                 String emailAddress = jsonObject.isNull("address") ? null : jsonObject.getString("address");
                 String status = jsonObject.isNull("status") ? null : jsonObject.getString("status");
@@ -141,10 +131,6 @@ public class ZeroBounceApi {
             HttpResponse httpResponse = httpClient.execute(httpGet);
             if (httpResponse.getStatusLine().getStatusCode() == 200) {
             JSONObject jsonObject = new JSONObject(EntityUtils.toString(httpResponse.getEntity()));
-
-            if (jsonObject.has("error")) {
-                throw new ZeroBounceApiException(jsonObject.getString("error"));
-            }
 
             String emailAddress = jsonObject.isNull("address") ? null : jsonObject.getString("address");
             String status = jsonObject.isNull("status") ? null : jsonObject.getString("status");
